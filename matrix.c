@@ -108,7 +108,6 @@ void* multiplyMatrices(void* arg){
         }
         result->data[row][i] = sum;
         hw2_write_output(2, row + 1, i + 1, result->data[row][i]);
-        sem_post(&sem1[i]);
     }
     pthread_exit(NULL);
 }

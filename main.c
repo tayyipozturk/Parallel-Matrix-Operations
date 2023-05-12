@@ -2,8 +2,6 @@
 #include "hw2_output.h"
 
 int main() {
-    hw2_init_output();
-
     Matrix** matrices = readAllMatrices();
     Matrix* result0 = createMatrix(matrices[0]->rows, matrices[0]->cols);
     Matrix* result1 = createMatrix(matrices[2]->rows, matrices[2]->cols);
@@ -21,6 +19,8 @@ int main() {
     pthread_t* threads0 = malloc(sizeof(pthread_t) * matrices[0]->rows);
     pthread_t* threads1 = malloc(sizeof(pthread_t) * matrices[2]->cols);
     pthread_t* threads2 = malloc(sizeof(pthread_t) * matrices[0]->rows);
+
+    hw2_init_output();
 
     for (int i = 0; i < matrices[0]->rows; i++){
         sem_init(&sem0[i], 0, 0);
