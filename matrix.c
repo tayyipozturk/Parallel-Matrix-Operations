@@ -81,7 +81,9 @@ void* addMatrices1(void* arg){
         pthread_mutex_lock(&mutex[i]);
         count[i]++;
         if (count[i] >= matrix1->rows){
-            sem_post(&sem[i]);
+            for (int j = 0; j < semCount; j++){
+                sem_post(&sem[i]);
+            }
         }
         pthread_mutex_unlock(&mutex[i]);
     }
@@ -108,4 +110,5 @@ void* multiplyMatrices(void* arg){
         hw2_write_output(2, row + 1, i + 1, result->data[row][i]);
         sem_post(&sem1[i]);
     }
+    pthread_exit(NULL);
 }
