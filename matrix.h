@@ -25,8 +25,11 @@ typedef struct args1 {
     Matrix *matrix1;
     Matrix *matrix2;
     Matrix *result;
-    int col;
+    int row;
     sem_t* sem;
+    int* count;
+    int semCount;
+    pthread_mutex_t* mutex;
 } args1;
 
 typedef struct args2 {

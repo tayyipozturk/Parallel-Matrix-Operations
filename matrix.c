@@ -69,13 +69,43 @@ void* addMatrices1(void* arg){
     Matrix *matrix1 = arguments->matrix1;
     Matrix *matrix2 = arguments->matrix2;
     Matrix *result = arguments->result;
-    int col = arguments->col;
-    sem_t* sem = &arguments->sem[col];
+    int row = arguments->row;
+    sem_t* sem = arguments->sem;
+    int* count = arguments->count;
+    int semCount = arguments->semCount;
+    pthread_mutex_t* mutex = arguments->mutex;
 
-    for (int i = 0; i < matrix1->rows; i++){
-        result->data[i][col] = matrix1->data[i][col] + matrix2->data[i][col];
-        hw2_write_output(1, i + 1, col + 1, result->data[i][col]);
+    for (int i = 0; i < matrix1->cols; i++){
+        result->data[row][i] = matrix1->data[row][i] + matrix2->data[row][i];
+        hw2_write_output(1, row + 1, i + 1, result->data[row][i]);
+        pthread_mutex_lock(&mutex[i]);
+        count[i]++;
+        if (count[i] >= matrix1->rows){
+            sem_post(&sem[i]);
+        }
+        pthread_mutex_unlock(&mutex[i]);
     }
-    sem_post(sem);
     pthread_exit(NULL);
+}
+
+void* multiplyMatrices(void* arg){
+    args2 *arguments = (args2*) arg;
+    Matrix *matrix1 = arguments->matrix1;
+    Matrix *matrix2 = arguments->matrix2;
+    Matrix *result = arguments->result;
+    int row = arguments->row;
+    sem_t* sem0 = arguments->sem0;
+    sem_t* sem1 = arguments->sem1;
+
+    sem_wait(&sem0[row]);
+    for (int i = 0; i < matrix2->cols; i++){
+        int sum = 0;
+        sem_wait(&sem1[i]);
+        for (int j = 0; j < matrix1->cols; j++){
+            sum += matrix1->data[row][j] * matrix2->data[j][i];
+        }
+        result->data[row][i] = sum;
+        hw2_write_output(2, row + 1, i + 1, result->data[row][i]);
+        sem_post(&sem1[i]);
+    }
 }
